@@ -2,17 +2,16 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies
-RUN pip install pandas scikit-learn joblib fastapi uvicorn
+# Copy requirements first (for caching)
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all files
+# Copy rest of code
 COPY . .
 
-# Train the model (generates model.pkl and metrics.json)
+# Train model
 RUN python train.py
 
-# Expose port 8000
 EXPOSE 8000
 
-# Run FastAPI app
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
